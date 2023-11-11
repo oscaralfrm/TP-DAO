@@ -1,4 +1,8 @@
 from tkinter import *
+from tkinter import ttk
+from tkinter import messagebox
+from tkinter import font
+from tkinter import PhotoImage
 
 # Ventana Principal
 
@@ -9,25 +13,112 @@ class Principal:
     def __init__(self):
 
         # Ventana #1: Principal
-        self.ventanaPrincipal = Tk()
-        self.ventanaPrincipal.geometry('500x500')
-        self.ventanaPrincipal.title('Sistema de Préstamos Bibliotecarios - Principal')
+        self.ventana_principal = Tk()
+        self.ventana_principal.geometry('750x500')
+        self.ventana_principal.title('Grupo 13 - Codex Astralis - Sistema de Préstamos Bibliotecarios - Principal')
+       
+        # Personalización - General
+        self.fuente_personalizable = font.Font(family='Helvetica', size=13, weight="bold", slant="italic")
+
+
+
+        # Personalización - Sección #1
+        self.logo_buho = "TP-DAO\FRONT\PICS\logo_codex_blanco.png"
+        self.logo = PhotoImage(file=self.logo_buho)
+    
+       
+        # Sección #1 - Imagen y Logo del Grupo
+        self.seccion_logo = Frame(self.ventana_principal, bg="#23b5d3",
+                                  width=300, height=500)
+        self.seccion_logo.pack(side=LEFT, fill="both", expand=True)
         
-        # Sección #1 - Creación de Socios...
-        seccion_uno = LabelFrame(self.ventanaPrincipal, text='Registrar un Socio')
-        seccion_uno.grid(row = 0, column = 0, columnspan = 3, pady = 20)
         
+        # Elementos dentro de la Sección #1
+        titulo_ventana = Label(self.seccion_logo, text="Bienvenido al Sistema Gestor de Préstamos Bibliotecarios", font=self.fuente_personalizable,
+                                    pady=30, padx=20, bg="#23b5d3", fg="white")
+        titulo_ventana.grid(row=0, column=0, columnspan=5)
+        
+        logo_buho_blanco = Label(self.seccion_logo, image=self.logo, background="#23b5d3",
+                                 pady=20)
+        logo_buho_blanco.grid(row=1, column=0, columnspan=5)
+        
+        integrantes = Label(self.seccion_logo, text='Integrantes: ', bg="#23b5d3", fg="white",
+                            font=self.fuente_personalizable, pady=10)
+        integrantes.grid(row=2, column=0, columnspan=6)
+        
+        santiago = Label(self.seccion_logo, text='Orona, Santiago; Legajo: 95342 ', bg="#23b5d3", fg="white",
+                            font=self.fuente_personalizable, pady=2)
+        santiago.grid(row=3, column=0, columnspan=6)
+        
+        oscar = Label(self.seccion_logo, text='Romero Moreno, Oscar Alfonso; Legajo: 96454 ', bg="#23b5d3", fg="white",
+                            font=self.fuente_personalizable, pady=2)
+        oscar.grid(row=4, column=0, columnspan=6)
+        
+        martin = Label(self.seccion_logo, text=' Spadaccini Benedetti, Martin Matias; Legajo: 95168 ', bg="#23b5d3", fg="white",
+                            font=self.fuente_personalizable, pady=2)
+        martin.grid(row=5, column=0, columnspan=6)
+        
+        # Sección #2 - Opciones de Administración
+        self.seccion_opciones = Frame(self.ventana_principal, borderwidth=2, relief="solid", bg="#071013",
+                                   width=300, height=500)
+        self.seccion_opciones.pack(side=RIGHT, fill="both", expand=True)
+        
+        # Elementos dentro de la Sección #2
+        titulo_opciones = Label(self.seccion_opciones, text="Menú de Opciones", font=self.fuente_personalizable,
+                                    pady=30, padx=60, bg="#071013", fg="white")
+        titulo_opciones.pack()
+
+        botonera = Frame(self.seccion_opciones)
+        
+        espacio_logo_utn = Frame(self.seccion_opciones)
+        
+        self.logo_utn_blanco = "TP-DAO\FRONT\PICS\logo_utn_peque.png"
+        self.logo_utn = PhotoImage(file=self.logo_utn_blanco)
+        
+        
+        
+        # Opciones de Administración y Funcionalidades de la Aplicación
+        
+        admin_socios = Button(botonera, text="Administración Socios", command="", fg="white",
+                              bg="#23b5d3", font=self.fuente_personalizable, width=20)
+        admin_socios.pack()
+        
+        admin_libros = Button(botonera, text="Administración de Libros", command="", fg="white",
+                              bg="#23b5d3", font=self.fuente_personalizable, width=20)
+        admin_libros.pack()
+        
+        registrar_prestamos = Button(botonera, text="Registrar Préstamos", command="", fg="white",
+                              bg="#23b5d3", font=self.fuente_personalizable, width=20)
+        registrar_prestamos.pack()
+        
+        registrar_devoluciones = Button(botonera, text="Registrar Devoluciones", command="", fg="white",
+                              bg="#23b5d3", font=self.fuente_personalizable, width=20)
+        registrar_devoluciones.pack()
+        
+        registrar_extraviados = Button(botonera, text="Registrar Extraviados", command="", fg="white",
+                              bg="#23b5d3", font=self.fuente_personalizable, width=20)
+        registrar_extraviados.pack()
+        
+        botonera.pack(pady=50)
+    
+        espacio_logo_utn.pack()
+    
+        logo_utn_footer = Label(espacio_logo_utn, image=self.logo_utn, background="#071013",
+                                 pady=20)
+        logo_utn_footer.pack()
+    
+       
         # Ingresando los datos del nuevo Socio...
-        Label(seccion_uno, text='Nombre del Socio: ').grid(row = 1, column = 0)
+        
 
 
     
     # El método que se usará para mostrar el contenido de la ventana
     
     def mostrar(self):
-        self.ventanaPrincipal.mainloop()
+        self.ventana_principal.mainloop()
         
 
 
-ventanaPrincipal = Principal()
-ventanaPrincipal.mostrar()
+ventana_principal = Principal()
+ventana_principal.mostrar()
