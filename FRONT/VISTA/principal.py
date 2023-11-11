@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkinter import messagebox
 from tkinter import font
 from tkinter import PhotoImage
+from administrar_socio import *
 
 # Ventana Principal
 
@@ -20,12 +21,17 @@ class Principal:
         # Personalización - General
         self.fuente_personalizable = font.Font(family='Helvetica', size=13, weight="bold", slant="italic")
 
+        # Favicon de la Aplicación
+        self.ico = 'FRONT\PICS\icono_codex.ico'
+        self.icono = PhotoImage(file=self.ico)
+        
 
 
         # Personalización - Sección #1
-        self.logo_buho = "TP-DAO\FRONT\PICS\logo_codex_blanco.png"
+        self.logo_buho = "FRONT\PICS\logo_codex_blanco.png"
         self.logo = PhotoImage(file=self.logo_buho)
-    
+        self.ventana_principal.iconphoto(True, self.icono)
+        
        
         # Sección #1 - Imagen y Logo del Grupo
         self.seccion_logo = Frame(self.ventana_principal, bg="#23b5d3",
@@ -36,27 +42,27 @@ class Principal:
         # Elementos dentro de la Sección #1
         titulo_ventana = Label(self.seccion_logo, text="Bienvenido al Sistema Gestor de Préstamos Bibliotecarios", font=self.fuente_personalizable,
                                     pady=30, padx=20, bg="#23b5d3", fg="white")
-        titulo_ventana.grid(row=0, column=0, columnspan=5)
+        titulo_ventana.pack()
         
         logo_buho_blanco = Label(self.seccion_logo, image=self.logo, background="#23b5d3",
                                  pady=20)
-        logo_buho_blanco.grid(row=1, column=0, columnspan=5)
+        logo_buho_blanco.pack()
         
         integrantes = Label(self.seccion_logo, text='Integrantes: ', bg="#23b5d3", fg="white",
                             font=self.fuente_personalizable, pady=10)
-        integrantes.grid(row=2, column=0, columnspan=6)
+        integrantes.pack()
         
         santiago = Label(self.seccion_logo, text='Orona, Santiago; Legajo: 95342 ', bg="#23b5d3", fg="white",
                             font=self.fuente_personalizable, pady=2)
-        santiago.grid(row=3, column=0, columnspan=6)
+        santiago.pack()
         
         oscar = Label(self.seccion_logo, text='Romero Moreno, Oscar Alfonso; Legajo: 96454 ', bg="#23b5d3", fg="white",
                             font=self.fuente_personalizable, pady=2)
-        oscar.grid(row=4, column=0, columnspan=6)
+        oscar.pack()
         
         martin = Label(self.seccion_logo, text=' Spadaccini Benedetti, Martin Matias; Legajo: 95168 ', bg="#23b5d3", fg="white",
                             font=self.fuente_personalizable, pady=2)
-        martin.grid(row=5, column=0, columnspan=6)
+        martin.pack()
         
         # Sección #2 - Opciones de Administración
         self.seccion_opciones = Frame(self.ventana_principal, borderwidth=2, relief="solid", bg="#071013",
@@ -72,14 +78,14 @@ class Principal:
         
         espacio_logo_utn = Frame(self.seccion_opciones)
         
-        self.logo_utn_blanco = "TP-DAO\FRONT\PICS\logo_utn_peque.png"
+        self.logo_utn_blanco = "FRONT\PICS\logo_utn_peque.png"
         self.logo_utn = PhotoImage(file=self.logo_utn_blanco)
         
         
         
         # Opciones de Administración y Funcionalidades de la Aplicación
         
-        admin_socios = Button(botonera, text="Administración Socios", command="", fg="white",
+        admin_socios = Button(botonera, text="Administración Socios", command=self.abrir_administrar_socio, fg="white",
                               bg="#23b5d3", font=self.fuente_personalizable, width=20)
         admin_socios.pack()
         
@@ -108,10 +114,10 @@ class Principal:
         logo_utn_footer.pack()
     
        
-        # Ingresando los datos del nuevo Socio...
-        
-
-
+    # Ingresando los datos del nuevo Socio...
+    def abrir_administrar_socio(self):
+        ventana_socio = VentanaAdministrarSocio()
+        ventana_socio.mostrar()
     
     # El método que se usará para mostrar el contenido de la ventana
     

@@ -1,12 +1,14 @@
 import sqlite3
 
+# Usamos el Patrón Singleton...
+
 class Conexion:
     _instance = None
 
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(Conexion, cls).__new__(cls)
-            cls._instance.conn = sqlite3.connect('TP-DAO/BBDD/daoBBDD.sqlite')
+            cls._instance.conn = sqlite3.connect('BBDD\\tp-dao.db')
             cls._instance.cursor = cls._instance.conn.cursor()
         return cls._instance
 
@@ -20,17 +22,11 @@ class Conexion:
     def getCursor(self):
         return self.cursor
 
-# Ejemplo de uso:
-db_instance = Conexion()
-conn = db_instance.getConexion()
-cursor = db_instance.getCursor()
-
-# Realiza operaciones con la base de datos usando 'conn' y 'cursor'
-
-# Cierra la conexión y el cursor cuando hayas terminado
-cursor.close()
-conn.close()
-
-
+    def run_query(self, query, parameters = ()):
+            with sqlite3.connect(self.db_name) as conn:
+                cursor = conn.cursor()
+                result = cursor.execute(query, parameters)
+                conn.commit()
+            return result
 
 
