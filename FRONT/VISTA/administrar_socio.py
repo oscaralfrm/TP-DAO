@@ -3,14 +3,16 @@ from tkinter import ttk
 from tkinter import messagebox
 from tkinter import font
 from tkinter import PhotoImage
-# from BACK.MODELO.socio import Socio
-# from BACK.CONTROLADOR.conexion import *
+import sys
+sys.path.append("path/to/TPDAO/TPDAO")
+from BACK.MODELO import socio
+from BACK.CONTROLADOR import conexion
 
 class VentanaAdministrarSocio:
-    def __init__(self):
-        self.ventana_socio = Tk()
-        self.ventana_socio.geometry('800x650')
-        self.ventana_socio.title('Grupo 13 - Codex Astralis - Sistema de Préstamos Bibliotecarios - Administrar Socio')
+    def __init__(self, master):
+        self.master = master
+        self.master.geometry('800x650')
+        self.master.title('Grupo 13 - Codex Astralis - Sistema de Préstamos Bibliotecarios - Administrar Socio')
         
         # Personalización - General
         self.fuente_personalizable = font.Font(family='Helvetica', size=13, weight="bold", slant="italic")
@@ -18,7 +20,7 @@ class VentanaAdministrarSocio:
         # Favicon de la Aplicación
         self.icon_path = 'FRONT\PICS\icono_codex.ico'
         self.icon_image = PhotoImage(file=self.icon_path)
-        self.ventana_socio.iconphoto(True, self.icon_image)
+        self.master.iconphoto(True, self.icon_image)
         
         # Personalización Sección CRUD
         
@@ -27,7 +29,7 @@ class VentanaAdministrarSocio:
         
         # Sección de Ingreso de Datos del Socio - CRUD
         
-        self.seccion_crud = Frame(self.ventana_socio, bg="#23b5d3",
+        self.seccion_crud = Frame(self.master, bg="#23b5d3",
                                   width=500, height=300)
         self.seccion_crud.pack(side=TOP, fill='both', expand=True)
         
@@ -81,11 +83,13 @@ class VentanaAdministrarSocio:
         # Sección de Visualización de Datos de todos los Socios - CRUD (Grilla)
         
         
-        self.visualizacion_datos = Frame(self.ventana_socio, bg="white",
+        self.visualizacion_datos = Frame(self.master, bg="white",
                                   width=500, height=250)
         
         
-        self.grilla = ttk.Treeview(self.visualizacion_datos, column=("Nombre", "Apellido", "Tipo de Documento", "Número de Documento"), show='headings')
+        self.grilla = ttk.Treeview(self.visualizacion_datos, column=("ID", "Nombre", "Apellido", "Tipo de Documento", "Número de Documento"), show='headings')
+        self.grilla.column("ID", anchor=W, width=10)
+        self.grilla.heading("ID", text="ID")
         self.grilla.column("Nombre", anchor=W, width=100)
         self.grilla.heading("Nombre", text="Nombre")
         self.grilla.column("Apellido", anchor=W, width=100)
@@ -94,13 +98,20 @@ class VentanaAdministrarSocio:
         self.grilla.heading("Tipo de Documento", text="Tipo de Documento")
         self.grilla.column("Número de Documento", anchor=E, width=50)
         self.grilla.heading("Número de Documento", text="Número de Documento")
+        
+        # Barra Scroll
+        scrollbar = Scrollbar(self.visualizacion_datos, orient=VERTICAL)
+        scrollbar.pack(side=RIGHT, fill=Y)
+        self.grilla.config(yscrollcommand=scrollbar.set)
+        scrollbar.config(command=self.grilla.yview)
         self.grilla.pack(fill=BOTH, expand=True)
         
+        self.grilla.pack(fill=BOTH, expand=True)
         self.visualizacion_datos.pack(fill='both', expand=True)
         
         # Sección de Reporters y Consultas
         
-        self.seccion_reportes_consultas = Frame(self.ventana_socio, bg="#23b5d3",
+        self.seccion_reportes_consultas = Frame(self.master, bg="#23b5d3",
                                   width=500, height=20)
         self.seccion_reportes_consultas.pack(side=BOTTOM, fill='both', expand=True)
         
@@ -118,7 +129,4 @@ class VentanaAdministrarSocio:
 
 
     def mostrar(self):
-        self.ventana_socio.mainloop()
-
-new = VentanaAdministrarSocio()
-new.mostrar()
+        self.master.mainloop()

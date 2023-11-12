@@ -4,6 +4,7 @@ from tkinter import messagebox
 from tkinter import font
 from tkinter import PhotoImage
 from administrar_socio import *
+from administrar_libro import *
 
 # Ventana Principal
 
@@ -11,12 +12,12 @@ class Principal:
 
     # El constructor inicializará la ventana, con sus dimensiones y elementos.
 
-    def __init__(self):
+    def __init__(self, master):
 
         # Ventana #1: Principal
-        self.ventana_principal = Tk()
-        self.ventana_principal.geometry('750x500')
-        self.ventana_principal.title('Grupo 13 - Codex Astralis - Sistema de Préstamos Bibliotecarios - Principal')
+        self.master = master
+        self.master.geometry('750x500')
+        self.master.title('Grupo 13 - Codex Astralis - Sistema de Préstamos Bibliotecarios - Principal')
        
         # Personalización - General
         self.fuente_personalizable = font.Font(family='Helvetica', size=13, weight="bold", slant="italic")
@@ -24,17 +25,16 @@ class Principal:
         # Favicon de la Aplicación
         self.ico = 'FRONT\PICS\icono_codex.ico'
         self.icono = PhotoImage(file=self.ico)
-        
 
 
         # Personalización - Sección #1
         self.logo_buho = "FRONT\PICS\logo_codex_blanco.png"
         self.logo = PhotoImage(file=self.logo_buho)
-        self.ventana_principal.iconphoto(True, self.icono)
+        self.master.iconphoto(True, self.icono)
         
        
         # Sección #1 - Imagen y Logo del Grupo
-        self.seccion_logo = Frame(self.ventana_principal, bg="#23b5d3",
+        self.seccion_logo = Frame(self.master, bg="#23b5d3",
                                   width=300, height=500)
         self.seccion_logo.pack(side=LEFT, fill="both", expand=True)
         
@@ -65,7 +65,7 @@ class Principal:
         martin.pack()
         
         # Sección #2 - Opciones de Administración
-        self.seccion_opciones = Frame(self.ventana_principal, borderwidth=2, relief="solid", bg="#071013",
+        self.seccion_opciones = Frame(self.master, borderwidth=2, relief="solid", bg="#071013",
                                    width=300, height=500)
         self.seccion_opciones.pack(side=RIGHT, fill="both", expand=True)
         
@@ -89,9 +89,10 @@ class Principal:
                               bg="#23b5d3", font=self.fuente_personalizable, width=20)
         admin_socios.pack()
         
-        admin_libros = Button(botonera, text="Administración de Libros", command="", fg="white",
-                              bg="#23b5d3", font=self.fuente_personalizable, width=20)
+        admin_libros = Button(botonera, text="Administración de Libros", command=self.abrir_administrar_libro, fg="white",
+                            bg="#23b5d3", font=self.fuente_personalizable, width=20)
         admin_libros.pack()
+
         
         registrar_prestamos = Button(botonera, text="Registrar Préstamos", command="", fg="white",
                               bg="#23b5d3", font=self.fuente_personalizable, width=20)
@@ -105,6 +106,10 @@ class Principal:
                               bg="#23b5d3", font=self.fuente_personalizable, width=20)
         registrar_extraviados.pack()
         
+        generar_reportes = Button(botonera, text="Generar Reportes", command="", fg="white",
+                              bg="#23b5d3", font=self.fuente_personalizable, width=20)
+        generar_reportes.pack()
+        
         botonera.pack(pady=50)
     
         espacio_logo_utn.pack()
@@ -116,15 +121,21 @@ class Principal:
        
     # Ingresando los datos del nuevo Socio...
     def abrir_administrar_socio(self):
-        ventana_socio = VentanaAdministrarSocio()
+        ventana_socio = Toplevel(self.master)
+        admin_socio = VentanaAdministrarSocio(ventana_socio)
         ventana_socio.mostrar()
+    
+    def abrir_administrar_libro(self):
+        ventana_libro = Toplevel(self.master)
+        admin_libro = VentanaAdministrarLibro(ventana_libro)
+        ventana_libro.mostrar()
     
     # El método que se usará para mostrar el contenido de la ventana
     
     def mostrar(self):
-        self.ventana_principal.mainloop()
+        self.master.mainloop()
         
-
-
-ventana_principal = Principal()
-ventana_principal.mostrar()
+if __name__ == '__main__':
+    root = Tk()
+    ventana_principal = Principal(root)
+    ventana_principal.mostrar()
