@@ -23,12 +23,12 @@ class Principal:
         self.fuente_personalizable = font.Font(family='Helvetica', size=13, weight="bold", slant="italic")
 
         # Favicon de la Aplicación
-        self.ico = 'FRONT\PICS\icono_codex.ico'
+        self.ico = 'TPDAO\FRONT\PICS\icono_codex.ico'
         self.icono = PhotoImage(file=self.ico)
 
 
         # Personalización - Sección #1
-        self.logo_buho = "FRONT\PICS\logo_codex_blanco.png"
+        self.logo_buho = "TPDAO\FRONT\PICS\logo_codex_blanco.png"
         self.logo = PhotoImage(file=self.logo_buho)
         self.master.iconphoto(True, self.icono)
         
@@ -78,7 +78,7 @@ class Principal:
         
         espacio_logo_utn = Frame(self.seccion_opciones)
         
-        self.logo_utn_blanco = "FRONT\PICS\logo_utn_peque.png"
+        self.logo_utn_blanco = "TPDAO\FRONT\PICS\logo_utn_peque.png"
         self.logo_utn = PhotoImage(file=self.logo_utn_blanco)
         
         

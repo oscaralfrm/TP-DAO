@@ -21,13 +21,13 @@ class VentanaAdministrarLibro:
         self.fuente_personalizable = font.Font(family='Helvetica', size=13, weight="bold", slant="italic")
 
         # Favicon de la Aplicación
-        self.icon_path = 'FRONT\PICS\icono_codex.ico'
+        self.icon_path = 'TPDAO\FRONT\PICS\icono_codex.ico'
         self.icon_image = PhotoImage(file=self.icon_path)
         self.master.iconphoto(True, self.icon_image)
         
         # Personalización Sección CRUD
         
-        self.icono_libro = "FRONT\PICS\star-book.png"
+        self.icono_libro = "TPDAO\FRONT\PICS\star-book.png"
         self.logo_libro = PhotoImage(file=self.icono_libro)
         
         # Sección de Ingreso de Datos del Libro - CRUD
@@ -165,7 +165,6 @@ class VentanaAdministrarLibro:
                               bg="#23b5d3", font=self.fuente_personalizable, width=20)
         buscar_libro.pack(side="left", anchor="ne")
         
-        # Entry for ISBN
         self.codigo_libro = Entry(botonera_seccion_consultas, width=30, bd=0, relief="solid", justify='center',textvariable=self.isbn)
         self.codigo_libro.pack(side="right")
         
@@ -189,10 +188,8 @@ class VentanaAdministrarLibro:
         objeto_conexion = conexion.Conexion()
         objeto_conexion.borrar_todo_libro()
         self.limpiar_grilla()
-        objeto_conexion.reset_auto_increment()
 
     def agregar_libro(self):
-        # Get the values from the Tkinter variables
         nuevo_isbn = self.isbn.get()
         nuevo_titulo = self.titulo.get()
         nuevo_precio_reposicion = self.precio_reposicion.get()
@@ -248,7 +245,7 @@ class VentanaAdministrarLibro:
             return
 
         objeto_conexion = conexion.Conexion()
-        libro_encontrado = objeto_conexion.buscar_libro(isbn)
+        libro_encontrado = objeto_conexion.buscar_libro_conexion(isbn)
 
         if libro_encontrado:
             messagebox.showinfo('Buscar Libro:', f'Detalles del Libro:\n\n'

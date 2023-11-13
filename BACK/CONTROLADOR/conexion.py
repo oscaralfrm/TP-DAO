@@ -44,7 +44,7 @@ class Conexion:
     
     # Consultar Libros
     def consultar_socios(self):
-        conn = sqlite3.connect('BBDD\\tp-dao.db')
+        conn = sqlite3.connect('TPDAO\BBDD\TPDAO.db')
         cursor = conn.cursor()
         seleccionar_tabla = 'SELECT * FROM socio'
         cursor.execute(seleccionar_tabla)
@@ -53,8 +53,8 @@ class Conexion:
         conn.close()
         return datos
         
-    def buscar_socio(self, numeroDocumento):
-        conn = sqlite3.connect('BBDD\\tp-dao.db')
+    def buscar_socio_conexion(self, numeroDocumento):
+        conn = sqlite3.connect('TPDAO\BBDD\TPDAO.db')
         cursor = conn.cursor()
         sql = "SELECT * FROM socio WHERE numeroDocumento = {}".format(numeroDocumento)
         cursor.execute(sql)
@@ -68,7 +68,7 @@ class Conexion:
     # Paráms de Socio: Id, nombre, apellido, tipoDocumento, numeroDocumento
     
     def insertar_socio(self, socio):
-        conn = sqlite3.connect('BBDD\\tp-dao.db')
+        conn = sqlite3.connect('TPDAO\BBDD\TPDAO.db')
         cursor = conn.cursor()
         sql='''INSERT INTO socio (nombre, apellido, tipoDocumento, numeroDocumento) 
         VALUES('{}', '{}', '{}', '{}')'''.format(socio.nombre, socio.apellido, socio.tipoDocumento, 
@@ -81,8 +81,8 @@ class Conexion:
         return n    
 
     # Registrar Baja Libro
-    def eliminar_libro(self, id_socio):
-        conn = sqlite3.connect('BBDD\\tp-dao.db')
+    def eliminar_socio(self, id_socio):
+        conn = sqlite3.connect('TPDAO\BBDD\TPDAO.db')
         cursor = conn.cursor()
         sql = "DELETE FROM socio WHERE id = ?"
         cursor.execute(sql, (id_socio,))
@@ -93,7 +93,7 @@ class Conexion:
 
     
     def borrar_todo_socio(self):
-        conn = sqlite3.connect('BBDD\\tp-dao.db')
+        conn = sqlite3.connect('TPDAO\BBDD\TPDAO.db')
         cursor = conn.cursor()
         
         sql_delete_all = 'DELETE FROM socio'
@@ -111,7 +111,7 @@ class Conexion:
 
     # Actualizar Libro
     def modificar_socio(self, id_socio, nuevo_nombre, nuevo_apellido, nuevo_tipoDocumento, nuevo_numeroDocumento):
-        conn = sqlite3.connect('BBDD\\tp-dao.db')
+        conn = sqlite3.connect('TPDAO\BBDD\TPDAO.db')
         cursor = conn.cursor()
         sql = """UPDATE socio
                 SET nombre = ?, apellido = ?, tipoDocumento = ?, numeroDocumento = ?
@@ -133,7 +133,7 @@ class Conexion:
     
     # Consultar Libros
     def consultar_libros(self):
-        conn = sqlite3.connect('BBDD\\tp-dao.db')
+        conn = sqlite3.connect('TPDAO\BBDD\TPDAO.db')
         cursor = conn.cursor()
         seleccionar_tabla = 'SELECT * FROM libro'
         cursor.execute(seleccionar_tabla)
@@ -142,8 +142,8 @@ class Conexion:
         conn.close()
         return datos
         
-    def buscar_libro(self, isbn):
-        conn = sqlite3.connect('BBDD\\tp-dao.db')
+    def buscar_libro_conexion(self, isbn):
+        conn = sqlite3.connect('TPDAO\BBDD\TPDAO.db')
         cursor = conn.cursor()
         sql = "SELECT * FROM libro WHERE isbn = {}".format(isbn)
         cursor.execute(sql)
@@ -158,7 +158,7 @@ class Conexion:
 
     
     def insertar_libro(self, libro):
-        conn = sqlite3.connect('BBDD\\tp-dao.db')
+        conn = sqlite3.connect('TPDAO\BBDD\TPDAO.db')
         cursor = conn.cursor()
         sql='''INSERT INTO libro (isbn, titulo, precio_reposicion, estado) 
         VALUES('{}', '{}', '{}', '{}')'''.format(libro.isbn, libro.titulo, libro.precio_reposicion, 
@@ -172,7 +172,7 @@ class Conexion:
 
     # Registrar Baja Libro
     def eliminar_libro(self, id_libro):
-        conn = sqlite3.connect('BBDD\\tp-dao.db')
+        conn = sqlite3.connect('TPDAO\BBDD\TPDAO.db')
         cursor = conn.cursor()
         sql = "DELETE FROM libro WHERE id = ?"
         cursor.execute(sql, (id_libro,))
@@ -183,7 +183,7 @@ class Conexion:
 
     
     def borrar_todo_libro(self):
-        conn = sqlite3.connect('BBDD\\tp-dao.db')
+        conn = sqlite3.connect('TPDAO\BBDD\TPDAO.db')
         cursor = conn.cursor()
         
         sql_delete_all = 'DELETE FROM libro'
@@ -201,7 +201,7 @@ class Conexion:
 
     # Actualizar Libro
     def modificar_libro(self, id_libro, nuevo_isbn, nuevo_titulo, nuevo_precio, nuevo_estado):
-        conn = sqlite3.connect('BBDD\\tp-dao.db')
+        conn = sqlite3.connect('TPDAO\BBDD\TPDAO.db')
         cursor = conn.cursor()
         sql = """UPDATE libro
                 SET isbn = ?, titulo = ?, precio_reposicion = ?, estado = ?
