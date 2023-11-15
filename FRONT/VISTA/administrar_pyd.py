@@ -46,18 +46,9 @@ class VentanaAdministrarPyd:
         
         # Carga de Datos...
         
-        # Variables asociadas a cada Entry:
-        # Éstas variables son las que serán modificadas en el CRUD.
+        # Variables de uso en el programa.
         
-        self.socio_numeroDocumento = IntVar()
-        
-        self.libro_isbn = IntVar()
-        
-        self.titulo = StringVar()
-        
-        self.fecha_prestamo = StringVar()
-        
-        self.fecha_devolucion = StringVar()
+        self.id = IntVar()
         
         self.objeto_conexion = conexion.Conexion()
         
@@ -116,9 +107,11 @@ class VentanaAdministrarPyd:
                                     bg="#23b5d3", font=self.fuente_personalizable, width=10)
         registrar_devolucion.pack(side="left", anchor="nw")
         
-        borrar_libros = Button(botonera_seccion_crud, text="Borrar Todo", command=self.borrar_registros, fg="white",
+        '''
+        borrar_prestamos = Button(botonera_seccion_crud, text="Borrar Todo", command=self.borrar_registros, fg="white",
                               bg="#23b5d3", font=self.fuente_personalizable, width=10)
-        borrar_libros.pack(side="left", anchor="nw")
+        borrar_prestamos.pack(side="left", anchor="nw")
+        '''
         
         botonera_seccion_crud.pack()
         
@@ -158,7 +151,20 @@ class VentanaAdministrarPyd:
         
         # Sección de Consultas
     
-
+        self.seccion_reportes_consultas = Frame(self.master, bg="#23b5d3",
+                                  width=500, height=20)
+        self.seccion_reportes_consultas.pack(side=BOTTOM, fill='both', expand=True)
+    
+        botonera_seccion_consultas = Frame(self.seccion_reportes_consultas)
+    
+        buscar_prestamo = Button(botonera_seccion_consultas, text="Buscar Préstamo", command=self.buscar_prestamo, fg="white",
+                              bg="#23b5d3", font=self.fuente_personalizable, width=20)
+        buscar_prestamo.pack(side="left", anchor="ne")
+        
+        self.id_prestamo = Entry(botonera_seccion_consultas, width=30, bd=0, relief="solid", justify='center',textvariable=self.id)
+        self.id_prestamo.pack(side="right")
+        
+        botonera_seccion_consultas.pack(side=BOTTOM, pady=15, padx=10)
 
 
 
@@ -175,10 +181,12 @@ class VentanaAdministrarPyd:
     def limpiar_grilla(self):
         self.grilla.delete(*self.grilla.get_children())
         
+    '''   
     def borrar_registros(self):
         objeto_conexion = conexion.Conexion()
         objeto_conexion.borrar_todo_prestamo()
         self.limpiar_grilla()
+    '''
         
     def actualizar_prestamo(self):
         seleccionado = self.grilla.focus()
@@ -199,44 +207,64 @@ class VentanaAdministrarPyd:
             self.refrescar()
 
     # A fines prácticos, eliminar_prestamo = registrar_devolucion
-    def eliminar_prestamo(self):
+    def registrar_devolucion(self):
         seleccionado = self.grilla.focus()
         clave = self.grilla.item(seleccionado, 'text')
         objeto_conexion = conexion.Conexion()
-        
+
         if clave == '':
-            messagebox.showwarning('Eliminar: ', 'Debe seleccionar primero un elemento. Gracias.')
+            messagebox.showwarning('Devolver Préstamo:', 'Debe seleccionar primero un elemento. Gracias.')
         else:
             valores = self.grilla.item(seleccionado, 'values')
-            data = ' ISBN:' + ' ' + str(clave) + ' , ' + valores[2] + ' ' + valores[3] + ' , ' + valores[4]
-            respuesta = messagebox.askquestion('Eliminar: ', '¿Realmente desea eliminar el registro seleccionado? \n' + data)
-            
+            data = ' ID:' + ' ' + str(clave) + ' , ' + valores[1] + ' ' + valores[2] + ' , ' + valores[3]
+            respuesta = messagebox.askquestion('Devolver Préstamo:', '¿Realmente desea devolver el préstamo seleccionado? \n' + data)
+
             if respuesta == messagebox.YES:
-                n = objeto_conexion.eliminar_libro(clave)
-                if n == 1:
-                    messagebox.showinfo('Eliminar: ', 'Su registro fue eliminado correctamente.')
+                # Fetch the Prestamo object based on the selected ID
+                prestamo = objeto_conexion.get_prestamo_by_id(clave)
+
+                if prestamo:
+                    # Check the number of days for overdue
+                    if prestamo.cantidadDias <= 30:
+                        # Update the associated libro's estado to 'Disponible'
+                        sql_update_libro = "UPDATE libro SET estado = 'Disponible' WHERE isbn = ?"
+                        objeto_conexion.execute_query(sql_update_libro, (prestamo.isbn,))
+                    else:
+                        # Update the associated libro's estado to 'Extraviado' for overdue loans
+                        sql_update_libro = "UPDATE libro SET estado = 'Extraviado' WHERE isbn = ?"
+                        objeto_conexion.execute_query(sql_update_libro, (prestamo.isbn,))
+
+                    # Delete the Prestamo record
+                    sql_delete_prestamo = "DELETE FROM prestamo WHERE id = ?"
+                    objeto_conexion.execute_query(sql_delete_prestamo, (clave,))
+                    
+                    if prestamo.cantidadDias <= 30:
+                        messagebox.showinfo('Devolver Préstamo:', 'El préstamo fue devuelto correctamente. Registrando como \'Disponible\'.')
+                    else:
+                        messagebox.showinfo('Devolver Préstamo:', 'Lo sentimos. El libro se encuentra extraviado. Registrando como \'Extraviado\'.')
                     self.limpiar_grilla()
                     self.refrescar()
                 else:
-                    messagebox.showinfo('Eliminar: ', 'Lo sentimos. No fue posible borrar su registro.')
+                    messagebox.showinfo('Devolver Préstamo:', f'No se encontró un préstamo con el ID: {clave}')
 
     def buscar_prestamo(self):
-        isbn = self.isbn.get()
-        if not isbn:
-            messagebox.showwarning('Buscar Libro:', 'Por favor, ingrese un ISBN para buscar.')
+        id = self.id.get()
+        if not id:
+            messagebox.showwarning('Buscar Préstamo:', 'Por favor, ingrese un ID para buscar.')
             return
 
         objeto_conexion = conexion.Conexion()
-        libro_encontrado = objeto_conexion.buscar_libro_conexion(isbn)
+        prestamo_encontrado = objeto_conexion.buscar_prestamo_conexion(id)
 
-        if libro_encontrado:
-            messagebox.showinfo('Buscar Libro:', f'Detalles del Libro:\n\n'
-                                                f'ISBN: {libro_encontrado[1]}\n'
-                                                f'Título: {libro_encontrado[2]}\n'
-                                                f'Precio de Reposición: {libro_encontrado[3]}\n'
-                                                f'Estado: {libro_encontrado[4]}')
+        if prestamo_encontrado:
+            messagebox.showinfo('Buscar Préstamo:', f'Detalles del Préstamo:\n\n'
+                                                f'Número de Documento del Socio: {prestamo_encontrado[1]}\n'
+                                                f'ISBN del Libro: {prestamo_encontrado[2]}\n'
+                                                f'Fecha de Préstamo: {prestamo_encontrado[3]}\n'
+                                                f'Fecha de Devolución: {prestamo_encontrado[4]}\n'
+                                                f'Cantidad de Días del Préstamo: {prestamo_encontrado[5]}')
         else:
-            messagebox.showinfo('Buscar Libro:', f'No se encontró un libro con el ISBN: {isbn}')
+            messagebox.showinfo('Buscar Préstamo:', f'No se encontró un libro con el ISBN: {id}')
         
 
     def refrescar(self):
@@ -288,40 +316,29 @@ class VentanaAdministrarPyd:
             # Display a message or handle accordingly if Socio or Libro is not selected
             messagebox.showwarning('Registrar Préstamo:', 'Seleccione un Socio y un Libro para registrar el Préstamo.')
     
-    # Registrar Devolución
-    def registrar_devolucion(self):
-        # Get selected values from the comboboxes
-        selected_socio_numeroDocumento = self.socio_combobox.get()
-        selected_libro_isbn = self.libro_combobox.get()
+    
+    # Buscar Préstamo
+    
+    def buscar_prestamo(self):
+        id = self.id.get()
+        if not id:
+            messagebox.showwarning('Buscar Préstamo:', 'Por favor, ingrese un ID para buscar.')
+            return
 
-        # Get selected dates from the DateEntry widgets
-        selected_fecha_prestamo = self.fecha_prestamo.get_date()
-        selected_fecha_devolucion = self.fecha_devolucion.get_date()
+        objeto_conexion = conexion.Conexion()
+        prestamo_encontrado = objeto_conexion.buscar_prestamo_conexion(id)
 
-        # Check if both Socio and Libro are selected
-        if selected_socio_numeroDocumento and selected_libro_isbn:
-            # Calculate the number of days between loan and return dates
-            cantidad_dias_prestamo = (selected_fecha_devolucion - selected_fecha_prestamo).days
-
-            # Create a Prestamo object
-            nueva_devolucion = prestamo.Prestamo(
-                numeroDocumento=selected_socio_numeroDocumento,
-                isbn=selected_libro_isbn,
-                fechaPrestamo=str(selected_fecha_prestamo),
-                fechaDevolucion=str(selected_fecha_devolucion),
-                cantidadDias=cantidad_dias_prestamo
-            )
-
-            # Your existing code for inserting the Devolucion record
-            # (Note: You might need to adjust this depending on your implementation)
-            objeto_conexion = conexion.Conexion()
-            objeto_conexion.insertar_devolcion(nueva_devolucion)
-
-            # Display the number of days in the label
-            self.cantidad_dias_prestamo_label.config(text=f'Libro prestado por {cantidad_dias_prestamo} días', fg='red')
+        if prestamo_encontrado:
+            messagebox.showinfo('Buscar Préstamo:', f'Detalles del Préstamo:\n\n'
+                                                f'Número de Documento del Socio: {prestamo_encontrado[1]}\n'
+                                                f'ISBN del Libro: {prestamo_encontrado[2]}\n'
+                                                f'Fecha Préstamo: {prestamo_encontrado[3]}\n'
+                                                f'Fecha Devolución: {prestamo_encontrado[4]}\n'
+                                                f'Cantidad de Días del Préstamo: {prestamo_encontrado[5]}')
         else:
-            # Display a message or handle accordingly if Socio or Libro is not selected
-            messagebox.showwarning('Registrar Devolución:', 'Seleccione un Socio y un Libro para registrar la Devolución.')
+            messagebox.showinfo('Buscar Préstamo:', f'No se encontró un préstamo con el ID: {id}')
+    
+
     
     def mostrar(self):
         self.master.mainloop()

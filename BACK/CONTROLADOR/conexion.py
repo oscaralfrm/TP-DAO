@@ -2,10 +2,12 @@ import sqlite3
 from BACK.MODELO import libro
 from BACK.MODELO import socio
 from BACK.MODELO import estado
+from BACK.MODELO import prestamo
 
 # Usamos el Patrón Singleton...
 
 class Conexion:
+    
 
     # Métodos Query Específicos - Socio
     
@@ -16,6 +18,15 @@ class Conexion:
         for row in datos:
             aux = aux + str(row) + "\n"
         return aux
+    
+    # Método para realizar consultas
+    def execute_query(self, sql, values):
+        conn = sqlite3.connect('TPDAO\BBDD\TPDAO.db')
+        cursor = conn.cursor()
+        cursor.execute(sql, values)
+        conn.commit()
+        cursor.close()
+        conn.close()
     
     # Consultar Libros
     def consultar_socios(self):
@@ -316,6 +327,51 @@ class Conexion:
 
         # If Libro is not found, return None or raise an exception as needed
         return None
+    
+    def get_prestamo_by_id(self, selected_prestamo_id):
+        # Fetch Prestamo based on ID
+        
+        conn = sqlite3.connect('TPDAO\BBDD\TPDAO.db')
+        cursor = conn.cursor()
+        sql = "SELECT id, numeroDocumento, isbn, fechaPrestamo, fechaDevolucion, cantidadDias FROM prestamo WHERE id = ?"
+        cursor.execute(sql, (selected_prestamo_id,))
+        prestamo_data = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        # If Prestamo is found, create a Prestamo object and return it
+        if prestamo_data:
+            # Assuming socio and libro are instances of the Socio and Libro classes
+            numero_documento = prestamo_data[1]
+            isbn = prestamo_data[2]
+
+            # Fetch Socio details from the database
+            socio = self.get_socio_by_numeroDocumento(numero_documento)
+
+            # Fetch Libro details from the database
+            libro = self.get_libro_by_isbn(isbn)
+
+            return prestamo.Prestamo(
+                socio=socio,
+                libro=libro,
+                fechaPrestamo=prestamo_data[3],
+                fechaDevolucion=prestamo_data[4],
+                cantidadDias=prestamo_data[5]
+            )
+
+        # If Prestamo is not found, return None or raise an exception as needed
+        return None
+
+    
+    def buscar_prestamo_conexion(self, id):
+        conn = sqlite3.connect('TPDAO\BBDD\TPDAO.db')
+        cursor = conn.cursor()
+        sql = "SELECT * FROM prestamo WHERE id = {}".format(id)
+        cursor.execute(sql)
+        datos = cursor.fetchone()
+        cursor.close()    
+        conn.close()
+        return datos
 
     def consultar_prestamos(self):
         conn = sqlite3.connect('TPDAO\BBDD\TPDAO.db')
