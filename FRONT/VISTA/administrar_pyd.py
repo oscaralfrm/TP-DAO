@@ -16,7 +16,7 @@ class VentanaAdministrarPyd:
     def __init__(self, master):
         self.master = master
         self.master.geometry('1000x650')
-        self.master.title('Grupo 13 - Codex Astralis - Sistema de Préstamos Bibliotecarios - Administrar Préstamos y Devoluciones')
+        self.master.title('Grupo 13 - Codex Astralis - Sistema de Préstamos Bibliotecarios - Gestionar Préstamos, Devoluciones y Extravíos')
         
         # Personalización - General
         self.fuente_personalizable = font.Font(family='Helvetica', size=13, weight="bold", slant="italic")
@@ -37,7 +37,7 @@ class VentanaAdministrarPyd:
                                   width=500, height=300)
         self.seccion_crud.pack(side=TOP, fill='both', expand=True)
         
-        Label(self.seccion_crud, text='Ingresar Datos del Préstamo', font=self.fuente_personalizable,
+        Label(self.seccion_crud, text='Gestionar Préstamos, Devoluciones y Extravíos', font=self.fuente_personalizable,
               bg="#23b5d3", fg='white', pady=10).pack()
         
         logo_prestamo_libreria = Label(self.seccion_crud, image=self.logo_prestamo, background="#23b5d3",
@@ -72,17 +72,21 @@ class VentanaAdministrarPyd:
         socio_data = self.objeto_conexion.get_datos_socio()
         libro_data = self.objeto_conexion.get_datos_libro()
 
-        # Create a Combobox for Socio
-        Label(campo, text='Seleccionar Socio:', font=self.fuente_personalizable, bg='#23b5d3', fg='white').grid(row=0, column=0, pady=10)
-        self.socio_combobox = ttk.Combobox(campo, values=[socio.numeroDocumento for socio in socio_data])
+        # Combobox initialization for Socio
+        Label(campo, text='Documento del Socio', padx=20, font=self.fuente_personalizable, justify='center', anchor="center", bg='#23b5d3', fg='white').grid(row=0, column=0, sticky='e', pady=(0, 5))
+        socio_combobox_values = [f"{socio.numeroDocumento}" for socio in socio_data]
+        self.socio_combobox = ttk.Combobox(campo, values=socio_combobox_values, state="readonly")
+        self.socio_combobox.actual_values = [socio.numeroDocumento for socio in socio_data]
         self.socio_combobox.grid(row=0, column=1, pady=10)
+        self.socio_combobox.set('Seleccionar Socio:')  # Set initial display text
 
-        # ISBN del Libro
-        
-        # Create a Combobox for Libro
-        Label(campo, text='Seleccionar Libro:', font=self.fuente_personalizable, bg='#23b5d3', fg='white').grid(row=1, column=0, pady=10)
-        self.libro_combobox = ttk.Combobox(campo, values=[libro.isbn for libro in libro_data])
+        # Combobox initialization for Libro
+        Label(campo, text='ISBN del Libro', padx=20, font=self.fuente_personalizable, justify='center', anchor="center", bg='#23b5d3', fg='white').grid(row=1, column=0, sticky='e', pady=(0, 5))
+        libro_combobox_values = [f"{libro.isbn}" for libro in libro_data]
+        self.libro_combobox = ttk.Combobox(campo, values=libro_combobox_values, state="readonly")
+        self.libro_combobox.actual_values = [libro.isbn for libro in libro_data]
         self.libro_combobox.grid(row=1, column=1, pady=10)
+        self.libro_combobox.set('Seleccionar Libro:')  # Set initial display text
 
         # Fecha de Préstamo
         Label(campo, text='Fecha de Préstamo', padx=20, font=self.fuente_personalizable, justify='center', anchor="center", bg='#23b5d3', fg='white').grid(row=4, column=0, sticky='e', pady=(0, 5))
@@ -97,18 +101,18 @@ class VentanaAdministrarPyd:
         
         # Mensaje de Texto que avisa la cantidad de días de un préstamo
         
-        self.cantidad_dias_prestamo_label = Label(campo, text='', fg='red', bg='#23b5d3')
+        self.cantidad_dias_prestamo_label = Label(campo, text='Registre un Préstamo - Mostraremos la Cantidad de Días', fg='red', bg='#23b5d3')
         self.cantidad_dias_prestamo_label.grid(row=6, column=0, columnspan=2, pady=10)
         
         # Botonera de la Sección CRUD
 
         botonera_seccion_crud = Frame(self.seccion_crud)
         
-        registrar_prestamo = Button(botonera_seccion_crud, text="R. Préstamo", command=self.registrar_prestamo, fg="white",
+        registrar_prestamo = Button(botonera_seccion_crud, text="Préstamo", command=self.registrar_prestamo, fg="white",
                                     bg="#23b5d3", font=self.fuente_personalizable, width=10)
         registrar_prestamo.pack(side="left", anchor="nw")
 
-        registrar_devolucion = Button(botonera_seccion_crud, text="R. Devolución", command=self.registrar_devolucion, fg="white",
+        registrar_devolucion = Button(botonera_seccion_crud, text="Devolución", command=self.registrar_devolucion, fg="white",
                                     bg="#23b5d3", font=self.fuente_personalizable, width=10)
         registrar_devolucion.pack(side="left", anchor="nw")
         
@@ -154,6 +158,8 @@ class VentanaAdministrarPyd:
         
         # Sección de Consultas
     
+
+
 
 
     # Métodos del Préstamo
@@ -238,13 +244,15 @@ class VentanaAdministrarPyd:
         objeto_conexion = conexion.Conexion()
         datos = objeto_conexion.consultar_prestamos()
         for row in datos:
-                    self.grilla.insert("", END, text=row[0], values=(row[0], row[1], row[2], row[3], row[4]))
+                    self.grilla.insert("", END, text=row[0], values=(row[0], row[1], row[2], row[3], row[4], row[5]))
 
     # Registrar Préstamo - Dar un Préstamo de Alta
     def registrar_prestamo(self):
+        self.objeto_conexion = conexion.Conexion()
+
         # Get selected values from the comboboxes
-        selected_socio_numeroDocumento = self.socio_combobox.get()
-        selected_libro_isbn = self.libro_combobox.get()
+        selected_socio_numeroDocumento = self.socio_combobox.actual_values[self.socio_combobox.current()]
+        selected_libro_isbn = self.libro_combobox.actual_values[self.libro_combobox.current()]
 
         # Fetch the Socio object based on the selected document number
         selected_socio = self.objeto_conexion.get_socio_by_numeroDocumento(selected_socio_numeroDocumento)
@@ -271,7 +279,7 @@ class VentanaAdministrarPyd:
             # Your existing code for inserting the Prestamo record
             objeto_conexion = conexion.Conexion()
             objeto_conexion.insertar_prestamo(nuevo_prestamo)
-            
+
             self.refrescar()
 
             # Display the number of days in the label
@@ -279,7 +287,6 @@ class VentanaAdministrarPyd:
         else:
             # Display a message or handle accordingly if Socio or Libro is not selected
             messagebox.showwarning('Registrar Préstamo:', 'Seleccione un Socio y un Libro para registrar el Préstamo.')
-        
     
     # Registrar Devolución
     def registrar_devolucion(self):

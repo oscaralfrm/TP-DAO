@@ -217,86 +217,104 @@ class Conexion:
         cursor = conn.cursor()
 
         # Check if the number of existing loans for the given numeroDocumento is less than 3
-        sql_count_loans = f"SELECT COUNT(*) FROM prestamo WHERE numeroDocumento = '{prestamo.numeroDocumento}'"
-        cursor.execute(sql_count_loans)
+        sql_count_loans = "SELECT COUNT(*) FROM prestamo WHERE numeroDocumento = ?"
+        cursor.execute(sql_count_loans, (prestamo.numeroDocumento,))
         existing_loans = cursor.fetchone()[0]
 
-        # Check if the socio has any book in the estado 'Extraviado'
-        sql_check_extraviado = f'''
+        # Check if the socio has any book in the estado 'Extraviado' or 'Prestado'
+        sql_check = '''
             SELECT COUNT(*) FROM prestamo 
             JOIN libro ON prestamo.isbn = libro.isbn 
-            WHERE prestamo.numeroDocumento = '{prestamo.numeroDocumento}' 
-            AND libro.estado = 'Extraviado' OR libro.estado = 'Prestado'
+            WHERE prestamo.numeroDocumento = ? 
+            AND (libro.estado = 'Extraviado' OR libro.estado = 'Prestado')
         '''
-        cursor.execute(sql_check_extraviado)
-        books_extraviado = cursor.fetchone()[0]
+        cursor.execute(sql_check, (prestamo.numeroDocumento,))
+        books_extraviado_or_prestado = cursor.fetchone()[0]
 
-        if existing_loans < 3 or books_extraviado == 0:
-            # Insert the new Prestamo record
-            sql_insert_prestamo = f'''
-                INSERT INTO prestamo (numeroDocumento, isbn, fechaPrestamo, fechaDevolucion, cantidadDias) 
-                VALUES ('{prestamo.numeroDocumento}', '{prestamo.isbn}', 
-                        '{prestamo.fechaPrestamo}', '{prestamo.fechaDevolucion}', '{prestamo.cantidadDias}')
-            '''
-            cursor.execute(sql_insert_prestamo)
+        if existing_loans < 3 and books_extraviado_or_prestado == 0:
+            # Check if the book is not already borrowed
+            sql_check_borrowed = "SELECT estado FROM libro WHERE isbn = ?"
+            cursor.execute(sql_check_borrowed, (prestamo.isbn,))
+            libro_estado = cursor.fetchone()
 
-            # Update the Libro estado to 'Prestado'
-            sql_update_libro = f"UPDATE libro SET estado = 'Prestado' WHERE isbn = '{prestamo.isbn}'"
-            cursor.execute(sql_update_libro)
+            if libro_estado and libro_estado[0] == 'Disponible':
+                # Insert the new Prestamo record
+                sql_insert_prestamo = '''
+                    INSERT INTO prestamo (numeroDocumento, isbn, fechaPrestamo, fechaDevolucion, cantidadDias) 
+                    VALUES (?, ?, ?, ?, ?)
+                '''
+                cursor.execute(sql_insert_prestamo, (
+                    prestamo.numeroDocumento,
+                    prestamo.isbn,
+                    prestamo.fechaPrestamo,
+                    prestamo.fechaDevolucion,
+                    prestamo.cantidadDias
+                ))
 
-            n = cursor.rowcount
-            conn.commit()
-            cursor.close()
-            conn.close()
-            return n
+                # Update the Libro estado to 'Prestado'
+                sql_update_libro = "UPDATE libro SET estado = 'Prestado' WHERE isbn = ?"
+                cursor.execute(sql_update_libro, (prestamo.isbn,))
+
+                n = cursor.rowcount
+                conn.commit()
+                cursor.close()
+                conn.close()
+                return n
+            else:
+                # If the book is already borrowed, return a message or handle accordingly
+                cursor.close()
+                conn.close()
+                return 0
         else:
-            # If the limit is reached or books are extraviado, return a message or handle accordingly
+            # If the limit is reached or books are extraviado or prestado, return a message or handle accordingly
             cursor.close()
             conn.close()
             return 0
+
         
-    def get_socio_by_numeroDocumento(self, numero_documento):
-        # Fetch Socio based on document number
-        conn = sqlite3.connect('TPDAO\BBDD\TPDAO.db')
-        cursor = conn.cursor()
-        sql = f"SELECT * FROM socio WHERE numeroDocumento = {numero_documento}"
-        cursor.execute(sql)
-        socio_data = cursor.fetchone()
-        cursor.close()
-        conn.close()
+    def get_socio_by_numeroDocumento(self, selected_socio_numeroDocumento):
+            # Fetch Socio based on document number
+            conn = sqlite3.connect('TPDAO\BBDD\TPDAO.db')
+            cursor = conn.cursor()
+            sql = "SELECT nombre, apellido, tipoDocumento, numeroDocumento FROM socio WHERE numeroDocumento = ?"
+            cursor.execute(sql, (selected_socio_numeroDocumento,))
+            socio_data = cursor.fetchone()
+            cursor.close()
+            conn.close()
 
-        # If Socio is found, create a Socio object and return it
-        if socio_data:
-            # Assuming you have a Socio class
-            # You might need to modify this based on your actual Socio class implementation
-            return socio.Socio(numeroDocumento=socio_data[0], nombre=socio_data[1], apellido=socio_data[2], tipoDocumento=socio_data[3])
+            # If Socio is found, create a Socio object and return it
+            if socio_data:
+                return socio.Socio(
+                    nombre=socio_data[0],
+                    apellido=socio_data[1],
+                    tipoDocumento=socio_data[2],
+                    numeroDocumento=socio_data[3]
+                )
 
-        # If Socio is not found, return None or raise an exception as needed
-        return None
-    
-    
-    def get_libro_by_isbn(self, isbn):
+            # If Socio is not found, return None or raise an exception as needed
+            return None
+
+    def get_libro_by_isbn(self, selected_libro_isbn):
         # Fetch Libro based on ISBN
         conn = sqlite3.connect('TPDAO\BBDD\TPDAO.db')
         cursor = conn.cursor()
-        sql = f"SELECT * FROM libro WHERE isbn = {isbn}"
-        cursor.execute(sql)
+        sql = "SELECT isbn, titulo, precio_reposicion, estado FROM libro WHERE isbn = ?"
+        cursor.execute(sql, (selected_libro_isbn,))
         libro_data = cursor.fetchone()
         cursor.close()
         conn.close()
 
         # If Libro is found, create a Libro object and return it
         if libro_data:
-            # Assuming libro_data[3] is the column index for estadoLibro in the libro table
             estado_libro = libro_data[3]
+            return libro.Libro(
+                isbn=libro_data[0],
+                titulo=libro_data[1],
+                precio_reposicion=libro_data[2],
+                estado_libro=estado_libro  # Use _estado instead of estado
+            )
 
-            # Create an instance of the Estado class
-            estado_instance = estado.Estado(estado_libro)
-
-            # Create a Libro object with _estado attribute
-            return libro.Libro(isbn=libro_data[0], titulo=libro_data[1], precio_reposicion=libro_data[2], estado_libro=estado_instance)
-
-        # If Libro is not found, return None
+        # If Libro is not found, return None or raise an exception as needed
         return None
 
     def consultar_prestamos(self):

@@ -71,13 +71,9 @@ class Principal:
                              fg="white", bg="#23b5d3", font=self.fuente_personalizable, width=20)
         admin_libros.pack(fill="both", expand=True)
 
-        registrar_pyd = Button(botonera, text="Registrar Prés. y Dev.", command=self.abrir_administrar_pyd, fg="white",
+        registrar_pyd = Button(botonera, text="Gestionar Préstamos", command=self.abrir_administrar_pyd, fg="white",
                                bg="#23b5d3", font=self.fuente_personalizable, width=20)
         registrar_pyd.pack(fill="both", expand=True)
-
-        registrar_extraviados = Button(botonera, text="Mostrar Extraviados", command="", fg="white",
-                                       bg="#23b5d3", font=self.fuente_personalizable, width=20)
-        registrar_extraviados.pack(fill="both", expand=True)
 
         generar_reportes = Button(botonera, text="Generar Reportes", command="", fg="white",
                                   bg="#23b5d3", font=self.fuente_personalizable, width=20)
