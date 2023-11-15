@@ -1,14 +1,17 @@
+from BACK.MODELO import estado
+
 class Libro:
-    def __init__(self, isbn, titulo, precio_reposicion, estado):
+    
+    def __init__(self, isbn, titulo, precio_reposicion, estado_libro):
         self._isbn = isbn
         self._titulo = titulo
         self._precio_reposicion = precio_reposicion
-        self._estado = estado
+        self._estado = estado.Estado(estado_libro)
         
-    def __str__(self) -> str:
-        return 'ISBN: ' + str(self.isbn) + ' | Título: ' + str(self.titulo) +\
-            ' | Precio de Reposición: ' + str(self.precio_reposicion) + \
-                ' | Estado: ' + str(self.estado) 
+    def __str__(self):
+        return 'ISBN: ' + str(self._isbn) + ' | Título: ' + str(self._titulo) +\
+            ' | Precio de Reposición: ' + str(self._precio_reposicion) + \
+                str(self._estado._estadoLibro)
                 
     # Métodos Accesores
     

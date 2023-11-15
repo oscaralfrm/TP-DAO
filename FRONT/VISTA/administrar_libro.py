@@ -63,22 +63,22 @@ class VentanaAdministrarLibro:
         campo = Frame(self.seccion_crud, width=300, height=300, bg='#23b5d3', borderwidth=2, relief="solid", padx=20, pady=10)
         campo.pack()
 
-        # Label and Entry for ISBN
+        # ISBN
         Label(campo, text='ISBN', padx=20, font=self.fuente_personalizable, justify='center', anchor="center", bg='#23b5d3', fg='white').grid(row=0, column=0, sticky='e', pady=(0, 5))
         self.codigo_libro = Entry(campo, width=30, textvariable=self.isbn)
         self.codigo_libro.grid(row=0, column=1, columnspan=3)
 
-        # Label and Entry for Título
+        # Título
         Label(campo, text='Título', padx=20, font=self.fuente_personalizable, justify='center', anchor="center", bg='#23b5d3', fg='white').grid(row=1, column=0, sticky='e', pady=(0, 5))
         self.titulo_libro = Entry(campo, width=30, textvariable=self.titulo)
         self.titulo_libro.grid(row=1, column=1, columnspan=3)
 
-        # Label and Entry for Precio de Reposición
+        # Precio de Reposición
         Label(campo, text='Precio de Reposición', font=self.fuente_personalizable, padx=20, justify='center', anchor="center", bg='#23b5d3', fg='white').grid(row=2, column=0, sticky='e', pady=(0, 5))
         self.precio_reposicion_libro = Entry(campo, width=30, textvariable=self.precio_reposicion)
         self.precio_reposicion_libro.grid(row=2, column=1, columnspan=3)
 
-        # Label and Entry for Estado
+        # Estado
         
         opciones_estado = ["Disponible", "Prestado", "Extraviado"]
         self.estado_var = StringVar()
@@ -91,8 +91,6 @@ class VentanaAdministrarLibro:
         estado_dropdown.config(width=15, font=self.fuente_personalizable)
         estado_dropdown.grid(row=3, column=1, columnspan=3, pady=(0, 5))
     
-
-        
         # Botonera de la Sección CRUD
 
         botonera_seccion_crud = Frame(self.seccion_crud)
@@ -119,14 +117,10 @@ class VentanaAdministrarLibro:
         
         botonera_seccion_crud.pack(side=BOTTOM, pady=10, padx=10)
         
-        
         # Sección de Visualización de Datos de todos los Socios - CRUD (Grilla)
-        
         
         self.visualizacion_datos = Frame(self.master, bg="white",
                                   width=500, height=250)
-        
-        
         
         self.grilla = ttk.Treeview(self.visualizacion_datos, column=("ID", "ISBN", "Título", "Precio de Reposición", "Estado"), show='headings')
         self.grilla.column("ID", anchor=W, width=10)
@@ -167,8 +161,6 @@ class VentanaAdministrarLibro:
         
         self.codigo_libro = Entry(botonera_seccion_consultas, width=30, bd=0, relief="solid", justify='center',textvariable=self.isbn)
         self.codigo_libro.pack(side="right")
-        
-        
         
         botonera_seccion_consultas.pack(side=BOTTOM, pady=25, padx=10)
 
